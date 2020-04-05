@@ -1,49 +1,59 @@
+const Joi = require('joi');
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
-const categories = [
-    { name: 'Food', parent: null },
-    { name: 'Vegetables', parent: 'Food' },
-    { name: 'Machines', parent: null },
-    { name: 'Cosmetics', parent: null }
-]
+const categorySchema = new mongoose.Schema({
+  name:{
+    type: String,
+    required: true, 
+    minlength:3,
+    maxlength: 20
+  },
+  parent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'name'
+  }
+});
 
-router.post('/', (req, res) => {
+const Category = mongoose.model('Categories', categorySchema);
+
+router.post('/', async (req, res) => {
   const { error } = validateCategory(req.body);
   if(error) return res.status(400).send(error.details[0].message);
     
-  const category = {
-    name: req.boby.name, 
-    parent: req.body.parent  
-  };
-  categories.push(category);
+  let category = new Category({
+    name: req.body.name,
+    parent: req.body.parent
+  });
+
+  category = await category.save();
   res.send(category);
 });
 
-router.get('/:name', (req, res) => {
-    const category = categories.find(c => c.name === req.params.name);
-    if(!category) res.status(404).send('No category with the given name was not found');
+router.get('/:id', async (req, res) => {
+    const category = await Category.findById(req.params.id);
+    if(!category) res.status(404).send('No category with the given id was not found');
+    
     res.send(category);
   });
 
-router.put('/:name', (req, res) => {
+router.put('/:id', async (req, res) => {
   const { error } = validateCategory(req.body);
   if(error) return res.status(400).send(error.details[0].message);
-      
-  const categorie = categories.find(c => c.name === req.params.name)
-  if(!category) return res.status(404).send('No such category with the given name was found');
+       
+  const category = await Category.findByIdAndUpdate(req.params.id,
+   { name: req.body.name, parent: req.body.parent },
+   {new: true 
+  });
+  if(!category) return res.status(404).send('The category was not found.');
 
-  category.name = req.body.name;
-  category.parent = req.body.parent;
   res.send(category);
 });
 
-router.delete('/:name', (req, res) => {
-    const categorie = categories.find(c => c.name === req.params.name)
+router.delete('/:id', async (req, res) => {
+    const categorie = await Category.findByIdAndRemove(req.params.id);
     if(!category) return res.status(404).send('No such category with the given name was found');
-  
-    const index = categories.indexOf(category);
-    categories.splice(index, 1);
 
     res.send(category);
   });

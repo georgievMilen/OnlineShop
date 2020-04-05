@@ -12,6 +12,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "joi": "^13.7.0",
-    "mongoose": "^4.13.20"
+    "mongoose": "^5.0.1"
   }
 }
