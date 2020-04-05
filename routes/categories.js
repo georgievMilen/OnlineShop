@@ -1,30 +1,18 @@
-const Joi = require('joi');
-const mongoose = require('mongoose');
+const { validate } = require('../models/category');
+const { Category } = require('../models/category');
 const express = require('express');
 const router = express.Router();
 
-const categorySchema = new mongoose.Schema({
-  name:{
-    type: String,
-    required: true, 
-    minlength:3,
-    maxlength: 20
-  },
-  parent: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'name'
-  }
-});
-
-const Category = mongoose.model('Categories', categorySchema);
-
 router.post('/', async (req, res) => {
-  const { error } = validateCategory(req.body);
+  const { error } = validate(req.body);
   if(error) return res.status(400).send(error.details[0].message);
+
+  const parentCategory = await Customer.findById(req.body.parentId);
+  if(!parentCategory) return res.status(400).send('Invalid parent category');
     
   let category = new Category({
     name: req.body.name,
-    parent: req.body.parent
+    parentId: parentCategory.name
   });
 
   category = await category.save();
@@ -39,7 +27,7 @@ router.get('/:id', async (req, res) => {
   });
 
 router.put('/:id', async (req, res) => {
-  const { error } = validateCategory(req.body);
+  const { error } = validate(req.body);
   if(error) return res.status(400).send(error.details[0].message);
        
   const category = await Category.findByIdAndUpdate(req.params.id,
@@ -58,12 +46,4 @@ router.delete('/:id', async (req, res) => {
     res.send(category);
   });
   
-function validateCategory(category) {
-  const schema = {
-    name: Joi.string().min(3).required(),
-    parent: Joi.string().min(3)
-  };    
-  return Joi.validate(category, schema);
-}
-
 module.exports = router;  
