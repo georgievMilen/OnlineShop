@@ -1,13 +1,21 @@
+const path = require("path");
+const express = require("express");
+const dotenv = require("dotenv");
+const morgan = require("morgan");
+const colors = require("colors");
+const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
+const fileupload = require("express-fileupload");
+const errorHandler = require("./middleware/errorHandler");
+const connectDB = require("./config/db");
 
-const mongoose = require('mongoose');
-const categories = require('./routes/categories');
-const products = require('./routes/products');
-const fileupload = require('./routes/fileupload');
-const express = require('express');
-const app = express();
-var bodyParser = require('body-parser');
-const path = require('path');
-
+// Load env vars
+dotenv.config({ path: "./config/config.env"})
 mongoose.connect('mongodb://localhost/onlineshop', {useNewUrlParser:true})
   .then(() => console.log('Connected to MongoDB...'))
   .catch(err => console.error('Could not connect to MongoDB...', err))
