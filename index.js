@@ -79,3 +79,9 @@ const server = app.listen(
       .yellow.bold
   )
 );
+
+// Handle promise rejections
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Error: ${err.message}`.red);
+  server.close(() => process.exit(1));
+});
