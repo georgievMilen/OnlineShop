@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const categories = require('./routes/categories');
 const products = require('./routes/products');
