@@ -15,7 +15,7 @@ const errorHandler = require("./middleware/errorHandler");
 const connectDB = require("./config/db");
 
 // Load env vars
-dotenv.config({ path: "./config/config.env"})
+dotenv.config({ path: "./config/config.env" });
 
 // Connect to database
 connectDB();
@@ -26,7 +26,7 @@ app.use(cookieParser());
 
 //Route files
 const categories = require("./modules/categories/routes/categories");
-const products = require("./modules/produts/routes/produts");
+// const products = require("./modules/products/routes/products");
 const users = require("./modules/users/routes/users");
 const auth = require("./modules/users/routes/auth");
 
@@ -52,7 +52,7 @@ app.use(xss());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 mins
-  max: 200
+  max: 200,
 });
 app.use(limiter);
 
@@ -66,17 +66,16 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Mount routers
-app.use('/api/categories', categories);
-app.use('/api/products', products);
-app.use('/api/users', users);
-app.use('/api/auth', auth);
+app.use("/api/categories", categories);
+// app.use('/api/products', products);
+app.use("/api/users", users);
+app.use("/api/auth", auth);
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(
   PORT,
   console.log(
-    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
-      .yellow.bold
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
   )
 );
 
